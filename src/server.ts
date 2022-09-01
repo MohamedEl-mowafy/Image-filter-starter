@@ -1,4 +1,5 @@
-import express from 'express';
+import express, { Router } from 'express';
+import {Router, Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
@@ -17,15 +18,6 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   res.status(200).send("Welcome to the Cloud!");
   // } );
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
-
-  app.get("./util/util", (req: Request, res: Response) => {
-    let {make} = req.query;
-    let imageUrl = filterImageFromURL; 
-    if (make) {
-      imageUrl = filterImageFromURL
-    }
-
-  })
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
   // IT SHOULD
@@ -40,7 +32,16 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
-
+  app.get("/filteredImage" , async (req: Request, res: Response) => {
+    const image_url = req.query.image_url.toSring()
+    if (!image_url){
+      res.status(400).send("image url is required");
+    }
+    const filter_img = await filterImageFromURL(image_url);
+    res.status(200).sendFile(filter_img, () => {
+      deleteLocalFiles([filter_img]);
+    })
+  })
   //! END @TODO1
   
   // Root Endpoint
